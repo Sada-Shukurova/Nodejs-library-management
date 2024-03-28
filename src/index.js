@@ -83,13 +83,21 @@ app.put("/animals/:id", (req, res) => {
 
 app.put("/animals/hbd/:id", (req, res) => {
   const id = req.params.id;
+  let animalName = "";
   animals = animals.map((animal) => {
     if (animal.id === id) {
+      animalName = animal.name;
       return { ...animal, age: animal.age + 1 };
     }
     return animal;
   });
-  res.status(200).send({ message: "animal is updated, happy birthday", id });
+  if (animalName.length > 0) {
+    res
+      .status(200)
+      .send({ message: `happy birthday to you, ${animalName}`, id });
+  } else {
+    res.status(404).json({ message: `animal of type ${_type} not found` });
+  }
 });
 
 // ========== DELETE =========
@@ -102,8 +110,8 @@ app.delete("/animals/:id", (req, res) => {
 
 app.delete("/animals/type/:type", (req, res) => {
   const _type = req.params.type;
-  const animalByType = animals.filter((animal) => animal.type !== _type);
-  if (animalByType.length > 0) {
+  animals = animals.filter((animal) => animal.type !== _type);
+  if (animals.length > 0) {
     res.status(200).json({
       message: `all ${_type}s in the zoo are dead`,
     });
