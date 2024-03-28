@@ -50,15 +50,15 @@ app.get("/animals/count/:type", (req, res) => {
 app.get("/animals/calculateAverageAge/:type", (req, res) => {
   const _type = req.params.type;
   const animalCountByType = animals.filter((animal) => animal.type === _type);
-  const ageSum = animalType.reduce((a, b) => a + b.age, 0);
-  const averageAge = Math.round(ageSum / animalCountByType.length);
-  if (animalType.length > 0) {
-    res.status(200).json({
-      averageAge: `average age of ${_type} in the zoo is ${averageAge}`,
-    });
-  } else {
+  if (animalCountByType.length === 0) {
     res.status(404).json({ message: `animal of type ${_type} not found` });
+    return;
   }
+  const ageSum = animalCountByType.reduce((a, b) => a + b.age, 0);
+  const averageAge = (ageSum / animalCountByType.length).toFixed(1);
+  res.status(200).json({
+    averageAge: `average age of ${_type}s in the zoo is ${averageAge}`,
+  });
 });
 
 // ========== POST ===============
@@ -98,6 +98,18 @@ app.delete("/animals/:id", (req, res) => {
   const id = req.params.id;
   animals = animals.filter((us) => us.id !== id);
   res.status(200).send({ message: "animal is deleted", id });
+});
+
+app.delete("/animals/type/:type", (req, res) => {
+  const _type = req.params.type;
+  const animalByType = animals.filter((animal) => animal.type !== _type);
+  if (animalByType.length > 0) {
+    res.status(200).json({
+      message: `all ${_type}s in the zoo are dead`,
+    });
+  } else {
+    res.status(404).json({ message: `animal of type ${_type} not found` });
+  }
 });
 
 // ============= PATCH ==========
